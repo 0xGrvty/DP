@@ -11,6 +11,10 @@ public class DP {
 	private static ArrayList<String> plan;
 	private static ArrayList<Integer> costs;
 	private static Integer planCost;
+	private static Integer n = 11;
+	private static Integer OverallCost = 0;
+	private static Integer StationaryTime = 0;
+	private static Integer currBestDifference = 0;
 
 	public DP() {
 
@@ -51,10 +55,15 @@ public class DP {
 		plan = new ArrayList<String>(); // Final output path of the plan
 		costs = new ArrayList<Integer>(); // List of all possible costs
 		planCost = 0; // The current plan's cost.
+
 	}
 
 	public static void main (String[] args) {
 		DP dp = new DP();
+		int hi = recurse(NY, 0);
+		System.out.println(hi);
+
+		/*
 
 		for (int i = 0; i < DP.cities.size(); i++) {
 			DP.planCost = 0; // Reset the plan cost per city
@@ -91,6 +100,87 @@ public class DP {
 			System.out.println(cities.get(i).getCityName() + ": " + costs.get(i));
 		}
 
+		*/
+
+	}
+
+	public static int recurse(City state, int current) {
+		int CurrentCost = state.getOpCosts()[current];
+		StationaryTime++;
+		System.out.println(CurrentCost);
+		if (current == n) {
+			OverallCost += CurrentCost;
+			return OverallCost;
+		} 
+
+
+		int NYcost = cities.get(0).getOpCosts()[current + 1] + state.getReloCosts()[0];
+		int LAcost = cities.get(1).getOpCosts()[current + 1] + state.getReloCosts()[1];
+		int DENcost = cities.get(2).getOpCosts()[current + 1] + state.getReloCosts()[2];
+
+
+		if (state.getCityName().equals("NY")) {
+			if (NYcost < LAcost && NYcost < DENcost) {
+				recurse(NY, current + 1);
+			} else if (LAcost < DENcost) {
+				System.out.println("switch LA");
+				recurse(LA, current + 1);
+				CurrentCost += state.getReloCosts()[1];
+			} else {
+				checkValidity(NY, DEN, current, 0, 0);
+				System.out.println("switch DEN");
+				recurse(DEN, current + 1);
+				CurrentCost += state.getReloCosts()[2];
+			}
+		} else if (state.getCityName().equals("LA")) {
+			if (LAcost < NYcost && LAcost < DENcost) {
+				recurse(LA, current + 1);
+			} else if (NYcost < DENcost) {
+				System.out.println("switch NY");
+				recurse(NY, current + 1);
+				CurrentCost += state.getReloCosts()[0];
+			} else {
+				System.out.println("switchDEN");
+				recurse(DEN, current + 1);
+				CurrentCost += state.getReloCosts()[2];
+			}
+		} else {
+			if (DENcost < NYcost && DENcost < LAcost) {
+				recurse(DEN, current + 1);
+			} else if (NYcost < LAcost) {
+				System.out.println("switch NY");
+				recurse(NY, current + 1);
+				CurrentCost += state.getReloCosts()[0];
+			} else {
+				System.out.println("switch LA");
+				recurse(LA, current + 1);
+				CurrentCost += state.getReloCosts()[1];
+			}
+		}
+		
+		OverallCost += CurrentCost;
+		return OverallCost;
+	}
+
+	public static void checkValidity(City from, City to, int current, int movingCost, int stationary) {
+		int currBestDifference = from.getOpCosts()[current];
+		int currentPlaceholder = to.getOpCosts()[current];
+		System.out.println("yo");
+		System.out.println(currBestDifference);
+		System.out.println(currentPlaceholder);
+		while (current > 0) {
+			int fromCost = from.getOpCosts()[current];
+			int toCost = to.getOpCosts()[current];
+			if (toCost < fromCost) {
+				if (currBestDifference > fromCost - toCost) {
+					currBestDifference = fromCost - toCost;
+					currentPlaceholder = current - 1;
+				}
+			}
+			current--;
+		}
+		System.out.println(currentPlaceholder);
+		System.out.println(currBestDifference);
 	}
 
 }

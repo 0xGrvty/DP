@@ -1,9 +1,11 @@
-
+package src;
 import java.util.ArrayList;
+import src.City;
 
 public class DP {
 	private ArrayList<ArrayList<City>> allPaths = new ArrayList<>();
 	private ArrayList<ArrayList<City>> tempPaths = new ArrayList<>();
+	private static ArrayList<Integer> pathSumPlaceholder = new ArrayList<>();
 
 
 	public void calcCosts () {
@@ -31,6 +33,9 @@ public class DP {
 		//		tempPaths = allPaths;
 		for (int i = 11; i >= 0; i--) {
 			tempPaths = (ArrayList<ArrayList<City>>) allPaths.clone();
+			for (int k = 0; k < allPaths.size(); k++) {
+				pathSumPlaceholder.add(pathSum(allPaths.get(k)));
+			}
 			for (int j = 0; j < 3; j++) {
 				System.out.println("Row: " + j);
 				if (i == 11) {
@@ -46,11 +51,11 @@ public class DP {
 				min = Integer.MAX_VALUE;
 				cost = 0;
 				for (int k = 0; k < 3; k++) {
-					System.out.println("City: " + k);
-					System.out.println(OpCosts[j][i] + " " + RelocationCosts[j][k] + " " + pathSum(allPaths.get(k)));
-					System.out.println(pathSum(allPaths.get(k)) + RelocationCosts[j][k] + OpCosts[j][i]);
-					if ((pathSum(allPaths.get(k)) + RelocationCosts[j][k] + OpCosts[j][i]) < min) {
-						min = pathSum(allPaths.get(k)) + RelocationCosts[j][k] + OpCosts[j][i];
+					//System.out.println("City: " + k);
+					//System.out.println(OpCosts[j][i] + " " + RelocationCosts[j][k] + " " + pathSum(allPaths.get(k)));
+					//System.out.println(pathSum(allPaths.get(k)) + RelocationCosts[j][k] + OpCosts[j][i]);
+					if ((pathSumPlaceholder.get(k) + RelocationCosts[j][k] + OpCosts[j][i]) < min) {
+						min = pathSumPlaceholder.get(k) + RelocationCosts[j][k] + OpCosts[j][i];
 						index = k;
 						cost = OpCosts[j][i] + RelocationCosts[j][k];
 						System.out.println("Index set to: " + index);				
@@ -76,6 +81,7 @@ public class DP {
 
 //				System.out.println(pathSum(allPaths.get(j)) + "\n");
 			}
+			pathSumPlaceholder.clear();
 			allPaths = (ArrayList<ArrayList<City>>) tempPaths.clone();
 			
 		}
@@ -95,14 +101,21 @@ public class DP {
 		int small = Integer.MAX_VALUE;
 		int index = 0;
 		ArrayList<City> temp = new ArrayList<>();
-		
+		//int[] pathSumPlaceholder = new int[dp.allPaths.get(index).size()];
+
+		for (int k = 0; k < dp.allPaths.size(); k++) {
+			pathSumPlaceholder.add(dp.pathSum(dp.allPaths.get(k)));
+		}
+
 		for (int i = 0; i < dp.allPaths.size(); i++) {
-			if (dp.pathSum(dp.allPaths.get(i)) < small) {
-				small = dp.pathSum(dp.allPaths.get(i));
+			if (pathSumPlaceholder.get(i) < small) {
+				small = pathSumPlaceholder.get(i);
 				index = i;
 			}
 		}
+
 		System.out.println(small);
+		
 		for (int i = dp.allPaths.get(index).size() - 1; i >= 0; i--) {
 			System.out.print(dp.allPaths.get(index).get(i).getName() + " ");
 		}
